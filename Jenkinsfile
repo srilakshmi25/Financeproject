@@ -16,6 +16,7 @@ pipeline{
                                                       archiveArtifacts: '**/target/*.war'
                                        }
                                }
+                             }           
                                          
                           stage("deploy to tomcat server")
                           {
