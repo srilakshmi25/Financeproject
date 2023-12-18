@@ -14,6 +14,9 @@ pipeline{
                                        success{
                                                      echo "archieving the artifacts"
                                                       archiveArtifacts: '**/target/*.war'
+                                       }
+                               }
+                                         
                           stage("deploy to tomcat server")
                           {
                          }
