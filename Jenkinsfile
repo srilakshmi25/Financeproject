@@ -17,7 +17,7 @@ node{
     {archiveArtifacts artifacts: '**/*.jar', followSymlinks: false}
     stage ("check sock ")
     {
-        sh "sudo chmod 666 /var/run/docker.sock"
+        sh 'sudo chmod 666 /var/run/docker.sock'
         //sh "sudo service jenkins restart"
         
     }
