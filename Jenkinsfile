@@ -15,12 +15,12 @@ node{
     }
     stage ("Archive .jar file")
     {archiveArtifacts artifacts: '**/*.jar', followSymlinks: false}
-    stage ("check sock ")
+   /* stage ("check sock ")
     {
         sh 'chmod 666 /var/run/docker.sock'
         //sh "sudo service jenkins restart"
         
-    }
+    }*/
     
      stage('Image Build'){
         sh "docker build -t $containerName:$tag --pull --no-cache ."
