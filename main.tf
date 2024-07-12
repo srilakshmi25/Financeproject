@@ -98,7 +98,6 @@ resource "aws_eip" "one" {
 resource "aws_instance" "new-server" {
   ami           = "ami-0c2af51e265bd5e0e"
   instance_type = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.sg1.id]
   key_name = "project-key"
  
  network_interface {
