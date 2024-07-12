@@ -86,6 +86,7 @@ resource "aws_security_group" "sg1" {
 resource "aws_network_interface" "new-ip" {
   subnet_id   = aws_subnet.public01.id
   private_ips = ["10.0.1.10"]
+  security_groups = [ aws_security_group.sg1.id ]
 }
 
 resource "aws_eip" "one" {
