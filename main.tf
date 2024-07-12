@@ -90,12 +90,12 @@ resource "aws_network_interface" "new-ip" {
 }
 
 resource "aws_eip" "one" {
-  domain                    = "vpc"
-  network_interface         = aws_network_interface.new-ip.id
+  domain = "vpc"
+  network_interface   = aws_network_interface.new-ip.id
   associate_with_private_ip = "10.0.1.10"
 }
 
-resource "aws_instance" "prod-server" {
+resource "aws_instance" "new-server" {
   ami           = "ami-0c2af51e265bd5e0e"
   instance_type = "t2.micro"
   associate_public_ip_address = true
