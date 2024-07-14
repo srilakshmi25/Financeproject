@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 terraform {
   required_providers {
     aws = {
@@ -97,12 +90,10 @@ resource "aws_network_interface" "main" {
   subnet_id       = aws_subnet.main.id
   security_groups = [aws_security_group.main.id]
 }
-
 resource "aws_eip" "main" {
   vpc = true
   network_interface = aws_network_interface.main.id
- 
-
+} // <--- Add this closing brace
   
 
 
