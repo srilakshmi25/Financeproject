@@ -93,19 +93,20 @@ resource "aws_security_group" "proj-sg" {
     Name = "proj-sg1"
   }
 }
-
 # Create a new network interface
 resource "aws_network_interface" "proj-ni" {
   subnet_id       = aws_subnet.proj-subnet.id
   security_groups = [aws_security_group.proj-sg.id]
+  private_ip       = "10.0.1.10" // Assign a private IP within the subnet range
 }
 
 # Attach the elastic IP to the network interface
 resource "aws_eip" "proj-eip" {
   vpc = true
   network_interface         = aws_network_interface.proj-ni.id
-  associate_with_private_ip = "10.0.0.10"
+  depends_on                = [aws_network_interface.proj-ni] // Ensure ENI is created before EIP association
 }
+
 
 # Create an Ubuntu EC2 instance
 resource "aws_instance" "Prod-Server" {
