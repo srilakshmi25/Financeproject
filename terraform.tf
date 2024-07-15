@@ -129,3 +129,11 @@ EOF
     Name = "Prod-server"
   }
 }
+output "network_interface_id" {
+  value = aws_network_interface.proj-ni.id
+}
+
+output "ip_address" {
+  value = aws_eip.proj-eip.public_ip
+}
+
