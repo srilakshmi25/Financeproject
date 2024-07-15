@@ -1,3 +1,4 @@
+# Initialize Terraform
 terraform {
   required_providers {
     aws = {
@@ -7,38 +8,43 @@ terraform {
   }
 }
 
+# Configure the AWS provider
 provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_vpc" "main" {
+# Create a VPC
+resource "aws_vpc" "proj-vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+# Create an internet gateway
+resource "aws_internet_gateway" "proj-ig" {
+  vpc_id = aws_vpc.proj-vpc.id
   tags = {
     Name = "gateway1"
   }
 }
 
-resource "aws_route_table" "main" {
-  vpc_id = aws_vpc.main.id
+# Set up the route table
+resource "aws_route_table" "proj-rt" {
+  vpc_id = aws_vpc.proj-vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = aws_internet_gateway.proj-ig.id
   }
   route {
     ipv6_cidr_block = "::/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = aws_internet_gateway.proj-ig.id
   }
   tags = {
     Name = "rt1"
   }
 }
 
-resource "aws_subnet" "main" {
-  vpc_id            = aws_vpc.main.id
+# Set up the subnet
+resource "aws_subnet" "proj-subnet" {
+  vpc_id            = aws_vpc.proj-vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1d"
   tags = {
@@ -46,15 +52,17 @@ resource "aws_subnet" "main" {
   }
 }
 
-resource "aws_route_table_association" "main" {
-  subnet_id      = aws_subnet.main.id
-  route_table_id = aws_route_table.main.id
+# Associate the subnet with the route table
+resource "aws_route_table_association" "proj-rt-sub-assoc" {
+  subnet_id      = aws_subnet.proj-subnet.id
+  route_table_id = aws_route_table.proj-rt.id
 }
 
-resource "aws_security_group" "main" {
-  name        = "main-sg"
+# Create a security group
+resource "aws_security_group" "proj-sg" {
+  name        = "proj-sg"
   description = "Enable web traffic for the project"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.proj-vpc.id
   ingress {
     from_port   = 0
     to_port     = 0
@@ -82,22 +90,42 @@ resource "aws_security_group" "main" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "main-sg"
+    Name = "proj-sg1"
   }
 }
 
-resource "aws_network_interface" "main" {
-  subnet_id       = aws_subnet.main.id
-  security_groups = [aws_security_group.main.id]
+# Create a new network interface
+resource "aws_network_interface" "proj-ni" {
+  subnet_id       = aws_subnet.proj-subnet.id
+  security_groups = [aws_security_group.proj-sg.id]
 }
 
-resource "aws_eip" "main" {
+# Attach the elastic IP to the network interface
+resource "aws_eip" "proj-eip" {
   vpc = true
-  network_interface = aws_network_interface.main.id
+  network_interface         = aws_network_interface.proj-ni.id
+  associate_with_private_ip = "10.0.0.10"
 }
-    
 
-  
-
-
-
+# Create an Ubuntu EC2 instance
+resource "aws_instance" "Prod-Server" {
+  ami           = "ami-0a0e5d9c7acc336f1"
+  instance_type = "t2.medium"
+  availability_zone = "us-east-1d"
+  key_name               = "banking"
+  network_interface {
+    device_index = 0
+    network_interface_id = aws_network_interface.proj-ni.id
+  }
+  user_data = <<EOF
+#!/bin/bash
+sudo apt-get update -y
+sudo apt install docker.io -y
+sudo systemctl enable docker
+sudo docker run -itd -p 8085:8081 swathi683/banking-app1:1.1
+sudo docker start $(docker ps -aq)
+EOF
+  tags = {
+    Name = "Prod-server"
+  }
+}
