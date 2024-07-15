@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-1"
+  region = "us-east-1"
 }
 
 resource "aws_vpc" "main" {
@@ -40,7 +40,7 @@ resource "aws_route_table" "main" {
 resource "aws_subnet" "main" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-south-1b"
+  availability_zone = "us-east-1d"
   tags = {
     Name = "subnet1"
   }
@@ -90,10 +90,13 @@ resource "aws_network_interface" "main" {
   subnet_id       = aws_subnet.main.id
   security_groups = [aws_security_group.main.id]
 }
+
 resource "aws_eip" "main" {
   vpc = true
   network_interface = aws_network_interface.main.id
-} // <--- Add this closing brace
+}
+    
+
   
 
 
