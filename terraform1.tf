@@ -4,9 +4,12 @@ provider "aws" {
 }
 # Creating a VPC
 resource "aws_vpc" "project-vpc" {
- cidr_block = "10.0.0.0/16"
-}
+  cidr_block = "10.0.0.0/16"
 
+  tags = {
+    Name = "project-vpc"
+  }
+}
 # Create an Internet Gateway
 resource "aws_internet_gateway" "project-ig" {
  vpc_id = aws_vpc.project-vpc.id
