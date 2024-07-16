@@ -112,6 +112,17 @@ resource "aws_eip" "proj-eip" {
   network_interface = aws_network_interface.proj-ni.id
   depends_on        = [aws_network_interface.proj-ni]
 }
+# Create a TLS private key for Jenkins
+resource "tls_private_key" "jenkins" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Create an AWS key pair for Jenkins
+resource "aws_key_pair" "jenkins" {
+  key_name   = "jenkins"
+  public_key = tls_private_key.jenkins.public_key_openssh
+}
 
 # Create an Ubuntu EC2 instance
 resource "aws_instance" "Prod-Server" {
@@ -119,10 +130,13 @@ resource "aws_instance" "Prod-Server" {
   instance_type     = "t2.medium"
   availability_zone = "ap-south-1a"
   key_name          = aws_key_pair.jenkins.key_name
+
   network_interface {
     device_index          = 0
     network_interface_id  = aws_network_interface.proj-ni.id
   }
+}
+
   user_data = <<EOF
 #!/bin/bash
 sudo apt-get update -y
