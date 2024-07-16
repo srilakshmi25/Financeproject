@@ -1,4 +1,3 @@
-# Initialize Terraform
 terraform {
   required_providers {
     aws = {
@@ -46,7 +45,7 @@ resource "aws_route_table" "proj-rt" {
 resource "aws_subnet" "proj-subnet" {
   vpc_id            = aws_vpc.proj-vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-south-1"
+  availability_zone = "ap-south-1a"
   tags = {
     Name = "subnet1"
   }
@@ -93,42 +92,39 @@ resource "aws_security_group" "proj-sg" {
     Name = "proj-sg1"
   }
 }
+
+# Create a key pair
+resource "aws_key_pair" "jenkins" {
+  key_name   = "jenkins"
+  public_key = file("~/.ssh/jenkins.pem")
+}
+
 # Create a new network interface
 resource "aws_network_interface" "proj-ni" {
   subnet_id       = aws_subnet.proj-subnet.id
   security_groups = [aws_security_group.proj-sg.id]
-  private_ip       = "10.0.1.10" // 
+  private_ips     = ["10.0.1.10"]
 }
 
 # Attach the elastic IP to the network interface
 resource "aws_eip" "proj-eip" {
   vpc = true
-  network_interface         = aws_network_interface.proj-ni.id
-  depends_on                = [aws_network_interface.proj-ni] 
+  network_interface = aws_network_interface.proj-ni.id
+  depends_on        = [aws_network_interface.proj-ni]
 }
-
-# ... (rest of the code remains the same)
 
 # Create an Ubuntu EC2 instance
 resource "aws_instance" "Prod-Server" {
-  ami           = "ami-0c2af51e265bd5e0e"
-  instance_type = "t2.medium"
-  availability_zone = "ap-south-1"
-  key_name               = aws_key_pair.jenkins.key_name
+  ami               = "ami-0c2af51e265bd5e0e"
+  instance_type     = "t2.medium"
+  availability_zone = "ap-south-1a"
+  key_name          = aws_key_pair.jenkins.key_name
   network_interface {
-    device_index = 0
-    network_interface_id = aws_network_interface.proj-ni.id
+    device_index          = 0
+    network_interface_id  = aws_network_interface.proj-ni.id
   }
   user_data = <<EOF
 #!/bin/bash
 sudo apt-get update -y
 EOF
 }
-
-# Create a key pair
-resource "aws_key_pair" "jenkins" {
-  key_name   = "jenkins"
-   private_key = file("~/.ssh/jenkins.pem")
-}
-
-  
