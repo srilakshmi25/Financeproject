@@ -112,23 +112,24 @@ resource "aws_eip" "project-eip" {
  network_interface = aws_network_interface.project-ni.id
  associate_with_private_ip = "10.0.1.10"
 }
-
-
 # Creating an ubuntu EC2 instance
 resource "aws_instance" "Test-Server" {
- ami = "ami-0c2af51e265bd5e0e"
- instance_type = "t2.micro"
- availability_zone = "ap-south-1b"
- key_name = "jenkins"
- network_interface {
- device_index = 0
- network_interface_id = aws_network_interface.project-ni.id
- }
- user_data  = <<-EOF
- #!/bin/bash
-     sudo apt-get update -y
- EOF
- tags = {
- Name = "Test-Server"
- }
+  ami             = "ami-0c2af51e265bd5e0e"
+  instance_type   = "t2.micro"
+  availability_zone = "ap-south-1a"
+  key_name        = "jenkins"
+  network_interface {
+    device_index = 0
+    network_interface_id = aws_network_interface.project-ni.id
+  }
+  user_data  = <<-EOF
+  #!/bin/bash
+      sudo apt-get update -y
+  EOF
+  tags = {
+    Name = "Test-Server"
+  }
 }
+
+
+
