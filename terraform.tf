@@ -107,13 +107,14 @@ resource "aws_eip" "proj-eip" {
   depends_on                = [aws_network_interface.proj-ni] 
 }
 
+# ... (rest of the code remains the same)
 
 # Create an Ubuntu EC2 instance
 resource "aws_instance" "Prod-Server" {
   ami           = "ami-0c2af51e265bd5e0e"
   instance_type = "t2.medium"
   availability_zone = "ap-south-1"
-  key_name               = "jenkins"
+  key_name               = aws_key_pair.jenkins.key_name
   network_interface {
     device_index = 0
     network_interface_id = aws_network_interface.proj-ni.id
@@ -122,4 +123,12 @@ resource "aws_instance" "Prod-Server" {
 #!/bin/bash
 sudo apt-get update -y
 EOF
+}
+
+# Create a key pair
+resource "aws_key_pair" "jenkins" {
+  key_name   = "jenkins"
+   private_key = file("~/.ssh/jenkins.pem")
+}
+
   
