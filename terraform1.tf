@@ -117,7 +117,7 @@ resource "aws_eip" "proj-eip" {
 resource "aws_instance" "proj-instance" {
   ami           = "ami-0c2af51e265bd5e0e"
   instance_type = "t2.micro"
-  availability_zone = "us-east-1a"
+  availability_zone = "ap-south-1b"
   key_name = "jenkins"
 
   network_interface {
