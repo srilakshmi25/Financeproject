@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     aws = {
@@ -62,21 +63,18 @@ resource "aws_security_group" "proj-sg" {
   name        = "proj-sg"
   description = "Enable web traffic for the project"
   vpc_id      = aws_vpc.proj-vpc.id
-
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "HTTPS traffic"
     from_port   = 443
@@ -84,7 +82,6 @@ resource "aws_security_group" "proj-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "Allow port 80 inbound"
     from_port   = 80
@@ -92,7 +89,6 @@ resource "aws_security_group" "proj-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   tags = {
     Name = "proj-sg1"
   }
@@ -113,11 +109,10 @@ resource "aws_network_interface" "proj-ni" {
 
 # Attach the elastic IP to the network interface
 resource "aws_eip" "proj-eip" {
-  vpc                = true
-  network_interface  = aws_network_interface.proj-ni.id
-  depends_on         = [aws_network_interface.proj-ni]
+  vpc = true
+  network_interface = aws_network_interface.proj-ni.id
+  depends_on        = [aws_network_interface.proj-ni]
 }
-
 # Create a TLS private key for Jenkins
 resource "tls_private_key" "jenkins" {
   algorithm = "RSA"
@@ -141,6 +136,7 @@ resource "aws_instance" "Prod-Server" {
     device_index          = 0
     network_interface_id  = aws_network_interface.proj-ni.id
   }
+}
 
   user_data = <<EOF
 #!/bin/bash
