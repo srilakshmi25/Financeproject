@@ -27,18 +27,7 @@ pipeline {
              sh 'docker build -t shaikfaizu990/banking-project-demo:1.0 .'
                  }
              }
-       stage('Docker-Login') {
-          steps {
-               withCredentials([usernamePassword(credentialsId: 'docker-credentials-id', passwordVariable: 'docker_password', usernameVariable: 'docker_login')]) {
-               sh 'docker login -u $(docker_login) -p $(docker_password)' 
-                     }
-                }
-            }
-        stage('Push-Image') {
-           steps {
-               sh 'docker push shaikfaizu990/banking-project-demo:1.0'
-                     }
-                 }
+       
  }
 }
 
