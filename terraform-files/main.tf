@@ -2,7 +2,7 @@ resource "aws_instance" "test-server" {
   ami           = "ami-0e86e20dae9224db8"  # Replace with your AMI
   instance_type = "t2.micro"
   key_name      = "ansiblef"
-  vpc_security_group_ids = ["sg-03554e9643ea66aed"]
+  vpc_security_group_ids = ["sg-078c941ec791c7003"]
 
   tags = {
     Name = "test-server"
