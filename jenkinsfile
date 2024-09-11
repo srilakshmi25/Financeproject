@@ -27,7 +27,18 @@ pipeline {
              sh 'docker build -t shaikfaizu990/banking-project-demo:1.0 .'
                  }
              }
-       
+        stage('Docker-Login') {
+          steps {
+              withCredentials([usernamePassword(credentialsId: 'dockerhub-pwd', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_LOGIN')]) {
+             sh 'docker login -u $(DOCKER_LOGIN) -p $(DOCKER_PASSWORD)'
+        }
+    } 
+  }
+        stage('Push-Image') {
+           steps {
+              sh 'docker push shaikfaizu990/banking-project-demo:1.0'
+                }
+             }
  }
 }
 
