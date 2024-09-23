@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+
+    tools {
+        // Use the Maven version configured as M2_HOME
+        maven "M2_HOME"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Clone the correct Git repository
+                git 'https://github.com/faizan32419/star-agile-banking-finance.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Run Maven with test failures ignored
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        }
+
+        stage('Docker-Login') {
+            steps {
+                // Log in to Docker Hub before building the image
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-pwd', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_LOGIN')]) {
+                    sh 'docker login -u "$DOCKER_LOGIN" -p "$DOCKER_PASSWORD"'
+                }
+            }
+        }
+
+        stage('Create Docker Image') {
+            steps {
+                // Build Docker image
+                sh 'docker build -t shaikfaizu990/banking-project-demo:1.0 .'
+            }
+        }
+
+        stage('Push-Image') {
+            steps {
+                // Push Docker image to Docker Hub
+                sh 'docker push shaikfaizu990/banking-project-demo:1.0'
+            }
+        }
+        stage('Config & Deployment') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsAccessKey', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                dir('terraform-files') {
+                sh 'sudo chmod 600 ansiblef.pem'
+                sh 'terraform init'
+                sh 'terraform validate'
+                sh 'terraform apply --auto-approve'
+                        }
+                    }
+               }
+            }
+    }
+
+    post {
+        always {
+            // Always archive and report the test results
+            junit '**/target/surefire-reports/*.xml'
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, 
+                         reportDir: '/var/lib/jenkins/workspace/Care-Health/target/surefire-reports', 
+                         reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', 
+                         useWrapperFileDirectly: true])
+        }
+    }
+}
+///demo for pushing
+
