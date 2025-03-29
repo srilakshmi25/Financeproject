@@ -13,6 +13,6 @@
     command : sudo systemctl start docker
 
   - name: Deploy Docker Container
-    command: docker run -dt -p 8091:8081 --name c000 vedanshsri/myimg:latest
+    command: docker run -dt -p 8091:8081 --name c001 vedanshsri/myimg:latest
 
    
